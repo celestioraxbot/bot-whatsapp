@@ -31,14 +31,36 @@ async function startBrowser() {
       browserOptions.executablePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     }
     
-    const browser = await puppeteer.launch(browserOptions);
-    console.log('Navegador iniciado com sucesso');
-    return browser;
-  } catch (error) {
-    console.error('Erro ao iniciar o navegador:', error);
-    throw error;
-  }
+const puppeteer = require('puppeteer');
+
+async function iniciarBot() {
+    try {
+        const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/google-chrome-stable', // Define o caminho manualmente
+            headless: true, // Executa em modo headless (sem interface gráfica)
+            args: [
+                '--no-sandbox', 
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage', 
+                '--disable-accelerated-2d-canvas', 
+                '--disable-gpu'
+            ],
+        });
+
+        console.log("Navegador iniciado com sucesso!");
+
+        const page = await browser.newPage();
+        return browser; // Retorna o navegador para uso posterior
+
+    } catch (error) {
+        console.error('Erro ao iniciar o navegador:', error);
+        throw error; // Lança o erro para tratamento externo, se necessário
+    }
 }
+
+// Chamando a função
+iniciarBot().catch(console.error);
+
 
 // Variáveis globais
 let totalSales = 0;

@@ -27,13 +27,15 @@ RUN apt-get update && apt-get install -y \
   libvulkan1 \
   xdg-utils \
   curl \
-  && rm -rf /var/lib/apt/lists/*
+  --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Baixar e instalar o Google Chrome
-RUN curl -sSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o google-chrome-stable_current_amd64.deb && \
-  dpkg -i google-chrome-stable_current_amd64.deb && \
-  apt-get -f install -y && \
-  rm google-chrome-stable_current_amd64.deb
+RUN wget -q -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+  dpkg -i google-chrome.deb || apt-get -f install -y && \
+  rm google-chrome.deb
+
+# Definir caminho do Chrome no ambiente
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable"
 
 # Copiar o código-fonte do seu projeto para o contêiner
 COPY . .
