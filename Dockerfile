@@ -1,5 +1,5 @@
 # Usando a imagem oficial do Node.js como base
-FROM node:16-slim
+FROM node:18-alpine
 
 # Definir o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -8,34 +8,25 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependências do projeto
-RUN npm install
-
-# Instalar dependências para rodar o Puppeteer (como o Chromium)
-RUN apt-get update && apt-get install -y \
-  wget \
+RUN apk add --no-cache \
+  chromium \
+  nss \
+  freetype \
+  harfbuzz \
   ca-certificates \
   fontconfig \
-  libx11-dev \
-  libxcomposite-dev \
-  libxrandr-dev \
-  libgtk-3-0 \
-  libgbm-dev \
-  libasound2 \
-  libnss3 \
-  lsb-release \
-  fonts-liberation \
-  libvulkan1 \
-  xdg-utils \
-  curl \
-  --no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-# Baixar e instalar o Google Chrome
-RUN wget -q -O google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-  dpkg -i google-chrome.deb || apt-get -f install -y && \
-  rm google-chrome.deb
+  libx11 \
+  libxcomposite \
+  libxrandr \
+  libgtk-3 \
+  libgbm \
+  libasound \
+  libvulkan \
+  xdg-utils && \
+  npm install --production
 
 # Definir caminho do Chrome no ambiente
-ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-stable"
+ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
 
 # Copiar o código-fonte do seu projeto para o contêiner
 COPY . .

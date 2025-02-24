@@ -9,7 +9,40 @@ services:
     startCommand: node index.js
     healthCheckPath: /health
     envVars:
+      # Variáveis de ambiente gerais
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
+
+      # Links de checkout para produtos
+      - key: CHECKOUT_LINK_CEREBRO
+        value: "https://renovacaocosmica.shop/23/crb-fnl"
+      - key: CHECKOUT_LINK_CORPO_EMENTE
+        value: "https://renovacaocosmica.shop/23/crpint-fnl"
+      - key: CHECKOUT_LINK_SAUDE_AMANHA
+        value: "https://renovacaocosmica.shop/23/fnl-saude"
+      - key: CHECKOUT_LINK_SAUDE_IMERSIVA
+        value: "https://renovacaocosmica.shop/23/fnl-imersiva"
+      - key: CHECKOUT_LINK_ALONGAMENTOS
+        value: "https://renovacaocosmica.shop/23/alg-fnl"
+      - key: CHECKOUT_LINK_SONO_PROFUNDO
+        value: "https://renovacaocosmica.shop/23/sono-fnl"
+      - key: CHECKOUT_LINK_NERVOCURE
+        value: "https://renovacaocosmica.shop/23/nervocuretic"
+      - key: CHECKOUT_LINK_100QUEDA
+        value: "https://ev.braip.com/ref?pv=pro4rxm7&af=afivpggv51"
+      - key: CHECKOUT_LINK_DOR_SOB_CONTROLE
+        value: "https://renovacaocosmica.shop/23/fnl-inicial"
+      - key: CHECKOUT_LINK_ROSA_XANTINA
+        value: "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm"
+      - key: CHECKOUT_LINK_HEMOGOTAS
+        value: "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
+
+      # Chaves de API
+      - key: HUGGINGFACE_API_TOKEN
+        generateValue: true # Gera automaticamente um valor seguro
+      - key: OPENAI_API_KEY
+        generateValue: true # Gera automaticamente um valor seguro
+      - key: FB_ADS_API_URL
+        value: "https://api-inference.huggingface.co/models/facebook-ad-metrics" # URL da API do Gerenciador de Anúncios
