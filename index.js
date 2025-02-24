@@ -1,18 +1,15 @@
 require('dotenv').config();
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const { executablePath } = require('@sparticuz/chromium');  // Importando o executablePath de @sparticuz/chromium
+const { executablePath } = require('@sparticuz/chromium'); // Importando o executablePath de @sparticuz/chromium
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const FormData = require('form-data');
+const winston = require('winston');
 
 // Configuração inicial
 const express = require('express');
 const bodyParser = require('body-parser');
-const winston = require('winston');
 
 const app = express();
 app.use(bodyParser.json());
@@ -31,7 +28,7 @@ let checkoutLink = process.env.CHECKOUT_LINK || 'https://seu-link-de-checkout.co
 // Conhecimento sobre produtos
 const productKnowledge = {
     "cérebro em alta performance": {
-        description: "Um e-book onde ajudará a melhorar a sua questão neuronal do cérebro e melhorar cada dia a mais para ter uma vida saudável.",
+        description: "Um e-book onde ajudará a melhorar a sua questão neuronal do cérebro e melhor cada dia a mais para ter uma vida saudável.",
         link: "https://renovacaocosmica.shop/23/crb-fnl"
     },
     "corpo e mente": {
@@ -52,7 +49,7 @@ const productKnowledge = {
     },
     "rosa xantina": {
         description: "Você merece ter uma pele radiante e saudável todos os dias! Com uma fórmula poderosa e inovadora, o Rosa Xantina é o segredo para uma pele deslumbrante.",
-        link: "https://ev.braip.com/ref?pv=pro9y44w ⁡=afijp7y0qm"
+        link: "https://ev.braip.com/ref?pv=pro9y44w⁡=afijp7y0qm"
     },
     "os alongamentos essenciais": {
         description: "Melhore sua flexibilidade e alivie as tensões com 15 minutos diários! Alongamentos simples para fazer em casa e aliviar as tensões.",
@@ -60,7 +57,7 @@ const productKnowledge = {
     },
     "renavidiol cba": {
         description: "Descubra o poder do Canabinoid Active System™. A tecnologia que restaura a beleza da sua pele logo nas primeiras aplicações!",
-        link: "https://ev.braip.com/ref?pv=pro173dg ⁡=afimex7zn1"
+        link: "https://ev.braip.com/ref?pv=pro173dg⁡=afimex7zn1"
     },
     "nervocure": {
         description: "Conquiste uma vida sem dores de forma 100% segura e comprovada. Auxílio na diminuição das dores, queimação, formigamentos, agulhadas, choques e dormência.",
@@ -68,22 +65,23 @@ const productKnowledge = {
     },
     "100queda": {
         description: "Trinoxidil Americano! O único tratamento do mundo capaz de restaurar até 2.000 fios de cabelo por semana!",
-        link: "https://ev.braip.com/ref?pv=pro4rxm7 ⁡=afivpggv51"
+        link: "https://ev.braip.com/ref?pv=pro4rxm7⁡=afivpggv51"
     },
     "hemogotas": {
         description: "O único tratamento natural que age de dentro para fora com tecnologia americana avançada. Alívio rápido e duradouro para hemorróidas.",
-        link: "https://ev.braip.com/ref?pv=pror2eex ⁡=afilxjyn16"
+        link: "https://ev.braip.com/ref?pv=pror2eex⁡=afilxjyn16"
     }
 };
 
 // Configuração do cliente WhatsApp
+const puppeteer = require('puppeteer');
+
 const client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer: {
-    executablePath: executablePath(),  // Usando o Chromium fornecido pelo @sparticuz/chromium
+    executablePath: puppeteer.executablePath(),
   },
 });
-
 // Configuração de logs
 const logger = winston.createLogger({
     level: 'info',
