@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Client, LocalAuth } = require('whatsapp-web.js');
+const { executablePath } = require('@sparticuz/chromium');  // Importando o executablePath de @sparticuz/chromium
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 const fs = require('fs');
@@ -77,11 +78,10 @@ const productKnowledge = {
 
 // Configuração do cliente WhatsApp
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: 'qwen' }),
-    puppeteer: {
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    },
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    executablePath: executablePath(),  // Usando o Chromium fornecido pelo @sparticuz/chromium
+  },
 });
 
 // Configuração de logs
