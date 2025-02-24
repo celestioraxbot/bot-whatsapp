@@ -1,17 +1,18 @@
-<<<<<<< HEAD
 require('dotenv').config();
-=======
->>>>>>> 77f0d3cf70be7485960fe36d557ea9536e8687db
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 const fs = require('fs');
-<<<<<<< HEAD
+const path = require('path');
+const { exec } = require('child_process');
+const { promisify } = require('util');
+const FormData = require('form-data');
+
+// Configuração inicial
 const express = require('express');
 const bodyParser = require('body-parser');
 const winston = require('winston');
 
-// Configuração inicial
 const app = express();
 app.use(bodyParser.json());
 
@@ -50,7 +51,7 @@ const productKnowledge = {
     },
     "rosa xantina": {
         description: "Você merece ter uma pele radiante e saudável todos os dias! Com uma fórmula poderosa e inovadora, o Rosa Xantina é o segredo para uma pele deslumbrante.",
-        link: "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm"
+        link: "https://ev.braip.com/ref?pv=pro9y44w ⁡=afijp7y0qm"
     },
     "os alongamentos essenciais": {
         description: "Melhore sua flexibilidade e alivie as tensões com 15 minutos diários! Alongamentos simples para fazer em casa e aliviar as tensões.",
@@ -58,7 +59,7 @@ const productKnowledge = {
     },
     "renavidiol cba": {
         description: "Descubra o poder do Canabinoid Active System™. A tecnologia que restaura a beleza da sua pele logo nas primeiras aplicações!",
-        link: "https://ev.braip.com/ref?pv=pro173dg&af=afimex7zn1"
+        link: "https://ev.braip.com/ref?pv=pro173dg ⁡=afimex7zn1"
     },
     "nervocure": {
         description: "Conquiste uma vida sem dores de forma 100% segura e comprovada. Auxílio na diminuição das dores, queimação, formigamentos, agulhadas, choques e dormência.",
@@ -66,11 +67,11 @@ const productKnowledge = {
     },
     "100queda": {
         description: "Trinoxidil Americano! O único tratamento do mundo capaz de restaurar até 2.000 fios de cabelo por semana!",
-        link: "https://ev.braip.com/ref?pv=pro4rxm7&af=afivpggv51"
+        link: "https://ev.braip.com/ref?pv=pro4rxm7 ⁡=afivpggv51"
     },
     "hemogotas": {
-        description: "O único tratamento natural que age de dentro para fora com tecnologia americana avançada. Alívio rápido e duradouro para hemorroidas.",
-        link: "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
+        description: "O único tratamento natural que age de dentro para fora com tecnologia americana avançada. Alívio rápido e duradouro para hemorróidas.",
+        link: "https://ev.braip.com/ref?pv=pror2eex ⁡=afilxjyn16"
     }
 };
 
@@ -266,7 +267,7 @@ async function handleHelpCommand(message) {
             `- !gerar: Gera texto usando IA avançada.\n` +
             `- !imagem: Reconhece objetos em imagens.\n` +
             `- !limpeza: Limpa arquivos temporários e logs antigos.\n` +
-            `💡 Dica: Eu também posso interpretar perguntas informais e fornecer respostas adaptadas ao contexto!`;
+            `\nDica: Eu também posso interpretar perguntas informais e fornecer respostas adaptadas ao contexto!`;
         await message.reply(helpMessage);
     } catch (error) {
         logger.error('Erro ao processar o comando !ajuda:', error.message);
@@ -355,7 +356,7 @@ async function handleGenerateTextCommand(message) {
             return;
         }
         // Simulação de geração de texto
-        const generatedText = `🤖 Texto Gerado: Baseado no prompt "${prompt}", aqui está uma resposta simulada.`;
+        const generatedText = `📝 Texto Gerado: Baseado no prompt "${prompt}", aqui está uma resposta simulada.`;
         await message.reply(generatedText);
     } catch (error) {
         logger.error('Erro ao processar o comando !gerar:', error.message);
@@ -464,179 +465,4 @@ async function processTextMessage(text, userId) {
 }
 
 // Inicializa o cliente WhatsApp
-=======
-const path = require('path');
-const { exec } = require('child_process');
-const { promisify } = require('util');
-const FormData = require('form-data');
-
-// Chave de API para o Deepgram
-const DEEPGRAM_API_KEY = '105c05bbed8f253a20e0091c29fbe7dd257ba3e5';
-// Chave de API do Qwen
-const QWEN_API_KEY = 'sk-cb9a361af4624307a715485f718e7b88';
-
-// Objeto para armazenar o histórico de conversas
-const conversationHistory = {};
-
-// Produtos e informações
-const productLinks = {
-    "cérebro em alta performance": "https://renovacaocosmica.shop/23/crb-fnl",
-    "corpo e mente": "https://renovacaocosmica.shop/23/crpint-fnl",
-    "saúde do amanhã": "https://renovacaocosmica.shop/23/fnl-saude",
-    "saúde imersiva": "https://renovacaocosmica.shop/23/fnl-imersiva",
-    "15 alongamentos": "https://renovacaocosmica.shop/23/alg-fnl",
-    "sono profundo": "https://renovacaocosmica.shop/23/sono-fnl",
-    "nervocure": "https://renovacaocosmica.shop/23/nervocuretic",
-    "100queda": "https://ev.braip.com/ref?pv=pro4rxm7&af=afivpggv51",
-    "dor sob controle": "https://renovacaocosmica.shop/23/fnl-inicial",
-    "rosa xantina": "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm",
-    "hemogotas": "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
-};
-
-// Função para processar mensagens usando a API do Qwen com histórico
-async function processMessage(text, userId) {
-    try {
-        // Inicializa o histórico do usuário, se não existir
-        if (!conversationHistory[userId]) {
-            conversationHistory[userId] = [];
-        }
-
-        // Adiciona a mensagem do usuário ao histórico
-        conversationHistory[userId].push({ role: "user", content: text });
-
-        // Limita o histórico para as últimas 10 interações
-        if (conversationHistory[userId].length > 10) {
-            conversationHistory[userId].shift();
-        }
-
-        // Requisição para a API do Qwen
-        const response = await axios.post('https://api.qwen.com/v1/chat', {
-            model: "qwen-plus",
-            messages: [
-                { role: "system", content: "Você é um assistente útil." },
-                ...conversationHistory[userId]
-            ]
-        }, {
-            headers: {
-                'Authorization': `Bearer ${QWEN_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        // Resposta gerada
-        let reply = response.data.choices[0].message.content.trim();
-
-        // Verificar se o texto se refere a algum produto e fornecer o link
-        for (const product in productLinks) {
-            if (text.toLowerCase().includes(product)) {
-                reply += `\n\nQuer saber mais sobre ${product}? Aqui está o link: ${productLinks[product]}`;
-            }
-        }
-
-        // Adiciona a resposta da IA ao histórico
-        conversationHistory[userId].push({ role: "assistant", content: reply });
-
-        console.log(`Resposta gerada para ${userId}: ${reply}`);
-        return reply;
-    } catch (error) {
-        console.error('Erro ao processar mensagem:', error.response ? error.response.data : error.message);
-        return 'Desculpe, não consegui processar sua mensagem.';
-    }
-}
-
-// Função para aguardar um tempo
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-// Função para transcrever áudios usando o Deepgram
-async function transcribeAudio(audioPath) {
-    const form = new FormData();
-    form.append('file', fs.createReadStream(audioPath));
-
-    try {
-        const response = await axios.post('https://api.deepgram.com/v1/listen', form, {
-            headers: {
-                ...form.getHeaders(),
-                'Authorization': `Token ${DEEPGRAM_API_KEY}`,
-            }
-        });
-
-        const transcription = response.data.results.channels[0].alternatives[0].transcript;
-        return transcription;
-    } catch (error) {
-        console.error('Erro ao transcrever áudio:', error.response ? error.response.data : error.message);
-        return 'Desculpe, não consegui transcrever o áudio.';
-    }
-}
-
-// Função para processar imagens
-async function processImage(imagePath) {
-    // Simulando processamento de imagem
-    return 'Processamento de imagem concluído. Foto recebida!';
-}
-
-// Função para enviar áudio de resposta (gerado ou transcrito)
-async function sendAudioResponse(chat, text) {
-    // Aqui, você pode gerar áudio do texto utilizando um serviço de TTS, como o Google TTS ou outro
-    const audioFilePath = 'path/to/generated_audio.mp3';  // Caminho do arquivo de áudio gerado
-
-    // Envia o áudio para o WhatsApp
-    await chat.sendAudio(audioFilePath, 'resposta.mp3', { sendAudioAsVoice: true });
-}
-
-// Inicializa o cliente do WhatsApp
-const client = new Client({
-    authStrategy: new LocalAuth({ clientId: `qwen` }) // Salva a sessão localmente
-});
-
-// Gera o QR Code no terminal
-client.on('qr', (qr) => {
-    qrcode.generate(qr, { small: true });
-});
-
-// Quando estiver pronto, exibe uma mensagem
-client.on('ready', () => {
-    console.log('Client is ready!');
-});
-
-// Escuta mensagens recebidas
-client.on('message', async (message) => {
-    console.log(`Mensagem recebida de ${message.from}: ${message.body}`);
-
-    // Envia digitando
-    const chat = await message.getChat();
-    await chat.sendStateTyping();
-
-    // Espera 5 segundos antes de processar
-    await wait(5000);
-
-    let response;
-
-    // Verifica se a mensagem contém um áudio ou imagem
-    if (message.hasMedia) {
-        // Baixa a mídia
-        const media = await message.downloadMedia();
-        const mediaPath = path.join(__dirname, 'media', `${message.id.id}.${media.mimetype.split('/')[1]}`);
-        fs.writeFileSync(mediaPath, media.data);
-
-        if (media.mimetype.startsWith('audio')) {
-            // Se for um áudio, transcreve o áudio usando o Deepgram
-            response = await transcribeAudio(mediaPath);
-        } else if (media.mimetype.startsWith('image')) {
-            // Se for uma imagem, processa a imagem
-            response = await processImage(mediaPath);
-        }
-    } else {
-        // Processa a mensagem de texto com a API do Qwen usando o histórico
-        response = await processMessage(message.body, message.from);
-    }
-
-    // Responde a mensagem no WhatsApp
-    message.reply(response);
-
-    // Exemplo: Resposta com áudio (gerado ou transcrito)
-    await sendAudioResponse(chat, response);
-});
-
-// Inicializa o cliente
->>>>>>> 77f0d3cf70be7485960fe36d557ea9536e8687db
 client.initialize();

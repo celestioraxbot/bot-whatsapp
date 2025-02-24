@@ -1,3 +1,8 @@
-2025/02/24-00:56:15.945 2b14 Reusing MANIFEST C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database/MANIFEST-000001
-2025/02/24-00:56:15.946 2b14 Recovering log #3
-2025/02/24-00:56:15.947 2b14 Reusing old log C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database/000003.log 
+<<<<<<< HEAD
+2025/02/24-01:11:56.246 2a84 Reusing MANIFEST C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database/MANIFEST-000001
+2025/02/24-01:11:56.247 2a84 Recovering log #3
+2025/02/24-01:11:56.247 2a84 Reusing old log C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database/000003.log 
+=======
+2025/02/22-03:04:31.569 fb4 Creating DB C:\Users\User\Desktop\IAWHATSAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database since it was missing.
+2025/02/22-03:04:31.592 fb4 Reusing MANIFEST C:\Users\User\Desktop\IAWHATSAPP\.wwebjs_auth\session-qwen\Default\Service Worker\Database/MANIFEST-000001
+>>>>>>> 77f0d3cf70be7485960fe36d557ea9536e8687db
