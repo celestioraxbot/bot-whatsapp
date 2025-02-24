@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     autoDeploy: true
-    buildCommand: npm ci
+    buildCommand: npm ci && npx playwright install --with-deps chromium
     startCommand: node index.js
     healthCheckPath: /health
     envVars:
@@ -14,7 +14,6 @@ services:
         value: production
       - key: PORT
         value: 3000
-
       # Links de checkout para produtos
       - key: CHECKOUT_LINK_CEREBRO
         value: "https://renovacaocosmica.shop/23/crb-fnl"
@@ -38,11 +37,10 @@ services:
         value: "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm"
       - key: CHECKOUT_LINK_HEMOGOTAS
         value: "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
-
       # Chaves de API
       - key: HUGGINGFACE_API_TOKEN
-        generateValue: true # Gera automaticamente um valor seguro
+        generateValue: true
       - key: OPENAI_API_KEY
-        generateValue: true # Gera automaticamente um valor seguro
+        generateValue: true
       - key: FB_ADS_API_URL
-        value: "https://api-inference.huggingface.co/models/facebook-ad-metrics" # URL da API do Gerenciador de Anúncios
+        value: "https://api-inference.huggingface.co/models/facebook-ad-metrics"

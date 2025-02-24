@@ -22,8 +22,9 @@ async function startBrowser() {
       headless: true,
     };
 
+    // Define o caminho do navegador com base no ambiente
     if (process.env.NODE_ENV === 'production') {
-      browserOptions.executablePath = '/usr/bin/google-chrome-stable';
+      browserOptions.executablePath = '/usr/bin/chromium-browser'; // Caminho usado no Dockerfile
     } else {
       browserOptions.executablePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     }
@@ -72,7 +73,7 @@ const productKnowledge = {
   },
   "rosa xantina": {
     description: "Você merece ter uma pele radiante e saudável todos os dias! Com uma fórmula poderosa e inovadora, o Rosa Xantina é o segredo para uma pele deslumbrante.",
-    link: "https://ev.braip.com/ref?pv=pro9y44w⁡=afijp7y0qm"
+    link: "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm"
   },
   "os alongamentos essenciais": {
     description: "Melhore sua flexibilidade e alivie as tensões com 15 minutos diários! Alongamentos simples para fazer em casa e aliviar as tensões.",
@@ -80,7 +81,7 @@ const productKnowledge = {
   },
   "renavidiol cba": {
     description: "Descubra o poder do Canabinoid Active System™. A tecnologia que restaura a beleza da sua pele logo nas primeiras aplicações!",
-    link: "https://ev.braip.com/ref?pv=pro173dg⁡=afimex7zn1"
+    link: "https://ev.braip.com/ref?pv=pro173dg&af=afimex7zn1"
   },
   "nervocure": {
     description: "Conquiste uma vida sem dores de forma 100% segura e comprovada. Auxílio na diminuição das dores, queimação, formigamentos, agulhadas, choques e dormência.",
@@ -88,11 +89,11 @@ const productKnowledge = {
   },
   "100queda": {
     description: "Trinoxidil Americano! O único tratamento do mundo capaz de restaurar até 2.000 fios de cabelo por semana!",
-    link: "https://ev.braip.com/ref?pv=pro4rxm7⁡=afivpggv51"
+    link: "https://ev.braip.com/ref?pv=pro4rxm7&af=afivpggv51"
   },
   "hemogotas": {
     description: "O único tratamento natural que age de dentro para fora com tecnologia americana avançada. Alívio rápido e duradouro para hemorróidas.",
-    link: "https://ev.braip.com/ref?pv=pror2eex⁡=afilxjyn16"
+    link: "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
   }
 };
 
@@ -123,7 +124,7 @@ const client = new Client({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     executablePath: process.env.NODE_ENV === 'production'
-      ? '/usr/bin/google-chrome-stable'
+      ? '/usr/bin/chromium-browser' // Caminho usado no Dockerfile
       : process.env.CHROME_PATH || undefined
   }
 });
@@ -169,7 +170,7 @@ client.on('message', async (message) => {
       return;
     }
 
-    // Trata o comando !group <nome do grupo>
+    // Trata o comando !group
     if (text.startsWith('!group')) {
       const groupName = text.split(' ').slice(1).join(' ');
       if (!groupName) {
@@ -210,6 +211,22 @@ function deleteFile(filePath) {
     }
   } catch (error) {
     logger.error('Erro ao deletar arquivo:', error.message);
+  }
+}
+
+// Função para buscar métricas do Gerenciador de Anúncios via Hugging Face
+async function fetchAdManagerMetrics() {
+  try {
+    const response = await axios.get(process.env.FB_ADS_API_URL || 'https://api-inference.huggingface.co/models/facebook-ad-metrics', {
+      headers: {
+        'Authorization': `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`
+      }
+    });
+
+    return response.data;
+  } catch (error) {
+    logger.error('Erro ao buscar métricas do Gerenciador de Anúncios:', error.message);
+    throw new Error('Não foi possível obter as métricas do Gerenciador de Anúncios.');
   }
 }
 
@@ -330,128 +347,3 @@ function generateGroupSummary(messages) {
 
   return summary;
 }
-
-// Outras funções de comando (implementações omitidas para brevidade)
-async function handleCleanupCommand(message) { /* ... */ }
-async function handleReportCommand(message) { /* ... */ }
-async function handleKnowledgeCommand(message) { /* ... */ }
-async function handleHelpCommand(message) { /* ... */ }
-async function handleSentimentCommand(message) { /* ... */ }
-async function handleTranslateCommand(message) { /* ... */ }
-async function handleNerCommand(message) { /* ... */ }
-async function handleSummarizeCommand(message) { /* ... */ }
-async function handleGenerateTextCommand(message) { /* ... */ }
-async function handleImageRecognitionCommand(message) { /* ... */ }
-
-// Função principal para processar mensagens
-async function processMessage(message) {
-  try {
-    const chat = await message.getChat();
-    await chat.sendStateTyping();
-
-    let response;
-    if (message.hasMedia) {
-      const media = await message.downloadMedia();
-      if (media.mimetype.startsWith('audio')) {
-        const mediaDir = path.join(__dirname, 'media');
-        if (!fs.existsSync(mediaDir)) {
-          fs.mkdirSync(mediaDir, { recursive: true });
-        }
-
-        const audioPath = path.join(mediaDir, `${message.id.id}.mp3`);
-        fs.writeFileSync(audioPath, Buffer.from(media.data, 'base64'));
-        const transcript = await transcribeAudio(audioPath);
-        deleteFile(audioPath);
-        response = await processTextMessage(transcript, message.from);
-      } else if (media.mimetype.startsWith('image')) {
-        response = await processImage(media.data);
-      } else {
-        response = '📦 Formato de mídia não suportado.';
-      }
-    } else if (message.body && message.body.trim() !== '') {
-      response = await processTextMessage(message.body, message.from);
-    } else {
-      response = 'Olá! 😊 Como posso te ajudar hoje?';
-    }
-
-    await message.reply(response);
-  } catch (error) {
-    logger.error('Erro ao processar mensagem:', error.message || error);
-    await message.reply('Desculpe, ocorreu um erro ao processar sua mensagem.');
-  }
-}
-
-// Funções para processamento de mídia
-async function transcribeAudio(audioPath) {
-  logger.info(`Transcrevendo áudio: ${audioPath}`);
-  return 'Transcrição simulada do áudio.';
-}
-
-async function processImage(imageData) {
-  logger.info('Processando imagem recebida');
-  return '🖼️ Imagem recebida e processada.';
-}
-
-async function processTextMessage(text, userId) {
-  const greetings = ['olá', 'oi', 'ola', 'hello', 'hi'];
-  const farewells = ['tchau', 'adeus', 'até logo', 'bye', 'goodbye'];
-
-  if (greetings.some(g => text.toLowerCase().includes(g))) {
-    return `Olá! 😊 Como posso te ajudar hoje?`;
-  }
-
-  if (farewells.some(f => text.toLowerCase().includes(f))) {
-    return `Até logo! 👋 Volte sempre que precisar.`;
-  }
-
-  const productKeywords = Object.keys(productKnowledge);
-  for (const keyword of productKeywords) {
-    if (text.toLowerCase().includes(keyword)) {
-      const product = productKnowledge[keyword];
-      return `📦 *${keyword.toUpperCase()}*\n${product.description}\n🔗 Link: ${product.link}`;
-    }
-  }
-
-  if (process.env.OPENAI_API_KEY) {
-    try {
-      const response = await axios.post(
-        'https://api.openai.com/v1/completions',
-        {
-          model: 'text-davinci-003',
-          prompt: text,
-          max_tokens: 50,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      const generatedText = response.data.choices[0]?.text || 'Desculpe, não entendi sua solicitação.';
-      return generatedText.trim();
-    } catch (error) {
-      logger.error('Erro ao usar API de IA:', error.message);
-    }
-  }
-
-  return 'Obrigado por sua mensagem! Se estiver interessado em nossos produtos, digite o nome do produto ou use o comando !ajuda para ver os comandos disponíveis.';
-}
-
-// Rota para verificação de saúde do servidor
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// Inicializa o servidor Express
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor Express rodando na porta ${PORT}`);
-});
-
-// Inicializa o cliente WhatsApp
-client.initialize().catch(err => {
-  logger.error('Erro ao inicializar o cliente WhatsApp:', err);
-  console.error('Erro ao inicializar o cliente WhatsApp:', err);
-});

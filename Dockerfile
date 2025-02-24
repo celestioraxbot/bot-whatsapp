@@ -1,32 +1,35 @@
 # Usando a imagem oficial do Node.js como base
 FROM node:18-alpine
 
-# Definir o diretório de trabalho dentro do contêiner
+# Atualiza os repositórios e instala dependências essenciais para o Playwright
+RUN apk update && \
+    apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    fontconfig \
+    libx11 \
+    libxcomposite \
+    libxrandr \
+    gtk+3.0 \
+    mesa-gl \
+    alsa-lib \
+    vulkan-loader \
+    xdg-utils
+
+# Define diretório de trabalho
 WORKDIR /app
 
 # Copiar package.json e package-lock.json para o contêiner
 COPY package*.json ./
 
 # Instalar dependências do projeto
-RUN apk add --no-cache \
-  chromium \
-  nss \
-  freetype \
-  harfbuzz \
-  ca-certificates \
-  fontconfig \
-  libx11 \
-  libxcomposite \
-  libxrandr \
-  libgtk-3 \
-  libgbm \
-  libasound \
-  libvulkan \
-  xdg-utils && \
-  npm install --production
+RUN npm install --production
 
-# Definir caminho do Chrome no ambiente
-ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
+# Instalar dependências específicas do Playwright
+RUN npx playwright install --with-deps chromium
 
 # Copiar o código-fonte do seu projeto para o contêiner
 COPY . .
