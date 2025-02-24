@@ -1,0 +1,57 @@
+{
+  "name": "celestiorax-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Bot para WhatsApp com integração de API",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@alicloud/pop-core": "^1.8.0",
+    "@sparticuz/chromium": "^132.0.0",
+    "aws-sdk": "^2.1692.0",
+    "axios": "^1.7.9",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "form-data": "^4.0.2",
+    "puppeteer": "^24.2.1",
+    "puppeteer-core": "^24.2.1",
+    "qrcode-terminal": "^0.12.0",
+    "twilio": "^5.4.5",
+    "whatsapp-web.js": "^1.26.0",
+    "winston": "^3.17.0",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=16.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bitbucket.org/whatsapp-api-celestiorax/whatsappbot-api.git"
+  },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "api",
+    "puppeteer",
+    "heroku",
+    "chatbot",
+    "automation",
+    "customer-support"
+  ],
+  "author": "Renovação Cósmica",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://bitbucket.org/whatsapp-api-celestiorax/whatsappbot-api/issues"
+  },
+  "homepage": "https://bitbucket.org/whatsapp-api-celestiorax/whatsappbot-api#readme"
+}

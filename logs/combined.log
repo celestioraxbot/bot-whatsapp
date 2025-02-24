@@ -1,0 +1,65 @@
+{"level":"info","message":"Diretório criado: ./media","timestamp":"2025-02-23T22:01:49.367Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-23T22:01:49.378Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-23T22:02:36.004Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-23T22:02:45.452Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-23T22:16:15.049Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-23T22:16:23.246Z"}
+{"level":"info","message":"Mensagem recebida no chat [object Object]: olá","timestamp":"2025-02-23T22:16:34.105Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:176:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:16:34.107Z"}
+{"level":"info","message":"Mensagem recebida no chat [object Object]: !comando","timestamp":"2025-02-23T22:16:56.265Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:176:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:16:56.266Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-23T22:18:37.286Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-23T22:18:46.334Z"}
+{"level":"info","message":"Mensagem recebida no chat [object Object]: olá","timestamp":"2025-02-23T22:18:49.299Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:165:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:18:49.300Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-23T23:53:54.564Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-23T23:54:06.493Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-23T23:54:12.667Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T00:00:51.999Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T00:01:00.317Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T02:51:48.880Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T02:52:00.878Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T02:52:08.843Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T02:52:13.371Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T03:17:45.047Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:17:57.164Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !ajuda","timestamp":"2025-02-24T03:18:01.858Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:18:19.540Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !relatorio","timestamp":"2025-02-24T03:18:36.758Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: 01/10/2023","timestamp":"2025-02-24T03:19:31.063Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T03:27:40.741Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:27:50.275Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:27:54.183Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T03:30:29.197Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:30:37.993Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:30:39.960Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T03:30:39.961Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T03:37:03.723Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:37:12.510Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:37:18.918Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: eu quero saber sobre o produto rosa xantina","timestamp":"2025-02-24T03:38:12.490Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-24T03:38:51.047Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:39:02.704Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: oiii","timestamp":"2025-02-24T03:39:07.987Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !comandos","timestamp":"2025-02-24T03:41:20.100Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:43:09.880Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:43:22.497Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !comandos","timestamp":"2025-02-24T03:43:25.524Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:43:27.220Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:47:45.096Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:47:48.216Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:47:49.489Z"}
+{"error":{"code":"model_not_found","message":"The model `text-davinci-003` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations","param":null,"type":"invalid_request_error"},"level":"error","message":"Resposta da API:","timestamp":"2025-02-24T03:47:49.490Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:50:51.772Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá","timestamp":"2025-02-24T03:50:55.649Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !comandos","timestamp":"2025-02-24T03:51:01.544Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:51:03.142Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T03:56:47.483Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !comandos","timestamp":"2025-02-24T03:56:52.141Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !relatorio","timestamp":"2025-02-24T03:56:57.365Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: !group","timestamp":"2025-02-24T03:57:03.008Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: cancelar","timestamp":"2025-02-24T03:57:08.406Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:57:09.362Z"}
+{"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá, tudo bem?","timestamp":"2025-02-24T03:57:24.152Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:57:25.275Z"}
+{"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T04:12:08.390Z"}

@@ -1,0 +1,8 @@
+<<<<<<< HEAD
+2025/02/24-01:11:56.234 2b98 Reusing MANIFEST C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Local Storage\leveldb/MANIFEST-000001
+2025/02/24-01:11:56.235 2b98 Recovering log #3
+2025/02/24-01:11:56.235 2b98 Reusing old log C:\Users\User\Desktop\BOT-WHATSAZAPP\.wwebjs_auth\session-qwen\Default\Local Storage\leveldb/000003.log 
+=======
+2025/02/22-03:04:26.912 63c Creating DB C:\Users\User\Desktop\IAWHATSAPP\.wwebjs_auth\session-qwen\Default\Local Storage\leveldb since it was missing.
+2025/02/22-03:04:26.948 63c Reusing MANIFEST C:\Users\User\Desktop\IAWHATSAPP\.wwebjs_auth\session-qwen\Default\Local Storage\leveldb/MANIFEST-000001
+>>>>>>> 77f0d3cf70be7485960fe36d557ea9536e8687db

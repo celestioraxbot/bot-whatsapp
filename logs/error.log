@@ -1,0 +1,14 @@
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-23T22:02:45.452Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:176:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:16:34.107Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:176:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:16:56.266Z"}
+{"level":"error","message":"Erro ao processar mensagem: handleCleanupCommand is not defined","stack":"ReferenceError: handleCleanupCommand is not defined\n    at Client.<anonymous> (C:\\Users\\User\\Desktop\\BOT-WHATSAPP\\index.js:165:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2025-02-23T22:18:49.300Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-23T23:54:12.667Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T02:52:08.843Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T02:52:13.371Z"}
+{"level":"error","message":"Erro ao processar mensagem:","timestamp":"2025-02-24T03:30:39.961Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:43:27.220Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:47:49.489Z"}
+{"error":{"code":"model_not_found","message":"The model `text-davinci-003` has been deprecated, learn more here: https://platform.openai.com/docs/deprecations","param":null,"type":"invalid_request_error"},"level":"error","message":"Resposta da API:","timestamp":"2025-02-24T03:47:49.490Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:51:03.142Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:57:09.362Z"}
+{"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:57:25.275Z"}
