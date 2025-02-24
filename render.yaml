@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: whatsapp-bot
+    env: node
+    plan: free
+    region: oregon
+    autoDeploy: true
+    buildCommand: npm ci
+    startCommand: node index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000

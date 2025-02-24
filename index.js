@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const puppeteer = require('puppeteer'); // Importando o Puppeteer
+const puppeteer = require('puppeteer');
 const qrcode = require('qrcode-terminal');
 const axios = require('axios');
 const fs = require('fs');
@@ -13,6 +13,32 @@ const bodyParser = require('body-parser');
 
 const app = express();
 app.use(bodyParser.json());
+
+// Função para iniciar o navegador - corrigida com async/await
+async function startBrowser() {
+  try {
+    // Configurações para funcionar no Render.com
+    const browserOptions = {
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      headless: true
+    };
+    
+    // Verifica se está em produção (Render) ou desenvolvimento
+    if (process.env.NODE_ENV === 'production') {
+      browserOptions.executablePath = '/usr/bin/google-chrome-stable';
+    } else {
+      // Caminho local para Windows
+      browserOptions.executablePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    }
+    
+    const browser = await puppeteer.launch(browserOptions);
+    console.log('Navegador iniciado com sucesso');
+    return browser;
+  } catch (error) {
+    console.error('Erro ao iniciar o navegador:', error);
+    throw error;
+  }
+}
 
 // Variáveis globais
 let totalSales = 0;
@@ -73,15 +99,11 @@ const productKnowledge = {
     }
 };
 
-// Configuração do cliente WhatsApp
-const client = new Client({
-    authStrategy: new LocalAuth(),
-    puppeteer: {
-        executablePath: puppeteer.executablePath(), // Usando o Chromium fornecido pelo Puppeteer
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'], // Argumentos adicionais para evitar problemas de permissão
-    },
-});
+// Configuração da pasta de logs
+const logsDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+}
 
 // Configuração de logs
 const logger = winston.createLogger({
@@ -92,9 +114,21 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console({ format: winston.format.simple() }),
-        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'logs/combined.log' }),
+        new winston.transports.File({ filename: path.join(logsDir, 'error.log'), level: 'error' }),
+        new winston.transports.File({ filename: path.join(logsDir, 'combined.log') }),
     ],
+});
+
+// Configuração do cliente WhatsApp
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+        executablePath: process.env.NODE_ENV === 'production' 
+            ? '/usr/bin/google-chrome-stable' 
+            : process.env.CHROME_PATH || undefined
+    }
 });
 
 // Função para enviar QR Code
@@ -123,6 +157,7 @@ const commands = {
     '!resumo': handleSummarizeCommand,
     '!gerar': handleGenerateTextCommand,
     '!imagem': handleImageRecognitionCommand,
+    '!gerenciador': handleAdManagerCommand, // Novo comando para o Gerenciador de Anúncios
 };
 
 // Processamento de mensagens
@@ -169,7 +204,66 @@ function deleteFile(filePath) {
     }
 }
 
-// Funções de comando
+// Função para buscar métricas do Gerenciador de Anúncios via Hugging Face
+async function fetchAdManagerMetrics() {
+    try {
+        const response = await axios.get(process.env.FB_ADS_API_URL || 'https://api-inference.huggingface.co/models/facebook-ad-metrics', {
+            headers: {
+                'Authorization': `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`
+            }
+        });
+        
+        return response.data;
+    } catch (error) {
+        logger.error('Erro ao buscar métricas do Gerenciador de Anúncios:', error.message);
+        throw new Error('Não foi possível obter as métricas do Gerenciador de Anúncios.');
+    }
+}
+
+// Novo comando para o Gerenciador de Anúncios
+async function handleAdManagerCommand(message) {
+    try {
+        await message.reply('🔄 Buscando métricas do Gerenciador de Anúncios do Facebook...');
+        
+        const metrics = await fetchAdManagerMetrics();
+        
+        // Formata a resposta com as métricas
+        let response = `📊 *MÉTRICAS DO GERENCIADOR DE ANÚNCIOS*\n\n`;
+        
+        if (metrics) {
+            response += `📈 *Performance*\n`;
+            response += `- Impressões: ${metrics.impressions || 'N/A'}\n`;
+            response += `- Alcance: ${metrics.reach || 'N/A'}\n`;
+            response += `- Cliques: ${metrics.clicks || 'N/A'}\n`;
+            response += `- CTR: ${metrics.ctr || 'N/A'}%\n\n`;
+            
+            response += `💰 *Custos*\n`;
+            response += `- Custo total: R$ ${metrics.cost || 'N/A'}\n`;
+            response += `- CPC médio: R$ ${metrics.cpc || 'N/A'}\n`;
+            response += `- CPM: R$ ${metrics.cpm || 'N/A'}\n\n`;
+            
+            response += `🎯 *Conversões*\n`;
+            response += `- Total de conversões: ${metrics.conversions || 'N/A'}\n`;
+            response += `- Custo por conversão: R$ ${metrics.cost_per_conversion || 'N/A'}\n`;
+            
+            if (metrics.recommendations && metrics.recommendations.length > 0) {
+                response += `\n💡 *Recomendações*\n`;
+                metrics.recommendations.forEach((rec, index) => {
+                    response += `${index + 1}. ${rec}\n`;
+                });
+            }
+        } else {
+            response += `❌ Não foi possível obter as métricas no momento. Tente novamente mais tarde.`;
+        }
+        
+        await message.reply(response);
+    } catch (error) {
+        logger.error('Erro ao processar o comando !gerenciador:', error.message);
+        await message.reply('Desculpe, ocorreu um erro ao buscar as métricas do Gerenciador de Anúncios. Tente novamente mais tarde.');
+    }
+}
+
+// Funções de comando existentes
 async function handleCleanupCommand(message) {
     try {
         const tempDir = './temp';
@@ -266,6 +360,7 @@ async function handleHelpCommand(message) {
             `- !gerar: Gera texto usando IA avançada.\n` +
             `- !imagem: Reconhece objetos em imagens.\n` +
             `- !limpeza: Limpa arquivos temporários e logs antigos.\n` +
+            `- !gerenciador: Mostra métricas do Gerenciador de Anúncios do Facebook.\n` +
             `\nDica: Eu também posso interpretar perguntas informais e fornecer respostas adaptadas ao contexto!`;
         await message.reply(helpMessage);
     } catch (error) {
@@ -366,9 +461,9 @@ async function handleGenerateTextCommand(message) {
 async function handleImageRecognitionCommand(message) {
     try {
         await message.reply('Por favor, envie a imagem que deseja analisar.');
-        const media = await message.downloadMedia();
+        // Espera pela imagem
         // Simulação de reconhecimento de imagem
-        await message.reply('🖼️ Imagem recebida. Objetos detectados: Gato, Cadeira, Mesa.');
+        await message.reply('🖼️ Para análise de imagem, envie a imagem e aguarde o processamento.');
     } catch (error) {
         logger.error('Erro ao processar o comando !imagem:', error.message);
         await message.reply('Desculpe, ocorreu um erro ao analisar a imagem.');
@@ -384,8 +479,14 @@ async function processMessage(message) {
         if (message.hasMedia) {
             const media = await message.downloadMedia();
             if (media.mimetype.startsWith('audio')) {
-                const audioPath = `./media/${message.id.id}.mp3`;
-                fs.writeFileSync(audioPath, media.data);
+                // Cria diretório de media se não existir
+                const mediaDir = path.join(__dirname, 'media');
+                if (!fs.existsSync(mediaDir)) {
+                    fs.mkdirSync(mediaDir, { recursive: true });
+                }
+                
+                const audioPath = path.join(mediaDir, `${message.id.id}.mp3`);
+                fs.writeFileSync(audioPath, Buffer.from(media.data, 'base64'));
                 const transcript = await transcribeAudio(audioPath);
                 deleteFile(audioPath);
                 response = await processTextMessage(transcript, message.from);
@@ -407,13 +508,17 @@ async function processMessage(message) {
     }
 }
 
-// Funções fictícias para evitar erros
+// Funções para processamento de mídia
 async function transcribeAudio(audioPath) {
-    return 'Transcrição simulada.';
+    // Esta é uma função simulada, você precisará implementar a integração real
+    logger.info(`Transcrevendo áudio: ${audioPath}`);
+    return 'Transcrição simulada do áudio.';
 }
 
 async function processImage(imageData) {
-    return '🖼️ Imagem recebida.';
+    // Esta é uma função simulada, você precisará implementar a integração real
+    logger.info('Processando imagem recebida');
+    return '🖼️ Imagem recebida e processada.';
 }
 
 async function processTextMessage(text, userId) {
@@ -421,11 +526,11 @@ async function processTextMessage(text, userId) {
     const greetings = ['olá', 'oi', 'ola', 'hello', 'hi'];
     const farewells = ['tchau', 'adeus', 'até logo', 'bye', 'goodbye'];
 
-    if (greetings.includes(text.toLowerCase())) {
+    if (greetings.some(g => text.toLowerCase().includes(g))) {
         return `Olá! 😊 Como posso te ajudar hoje?`;
     }
 
-    if (farewells.includes(text.toLowerCase())) {
+    if (farewells.some(f => text.toLowerCase().includes(f))) {
         return `Até logo! 👋 Volte sempre que precisar.`;
     }
 
@@ -438,30 +543,49 @@ async function processTextMessage(text, userId) {
         }
     }
 
-    // Usa APIs de IA para gerar uma resposta inteligente
-    try {
-        const response = await axios.post(
-            'https://api.openai.com/v1/completions',
-            {
-                model: 'text-davinci-003',
-                prompt: text,
-                max_tokens: 50,
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json',
+    // Tenta gerar uma resposta usando a API de IA (Se configurada no .env)
+    if (process.env.OPENAI_API_KEY) {
+        try {
+            const response = await axios.post(
+                'https://api.openai.com/v1/completions',
+                {
+                    model: 'text-davinci-003',
+                    prompt: text,
+                    max_tokens: 50,
                 },
-            }
-        );
+                {
+                    headers: {
+                        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
 
-        const generatedText = response.data.choices[0]?.text || 'Desculpe, não entendi sua solicitação.';
-        return generatedText.trim();
-    } catch (error) {
-        logger.error('Erro ao usar API de IA:', error.message);
-        return 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.';
+            const generatedText = response.data.choices[0]?.text || 'Desculpe, não entendi sua solicitação.';
+            return generatedText.trim();
+        } catch (error) {
+            logger.error('Erro ao usar API de IA:', error.message);
+            // Fallback para resposta padrão em caso de erro
+        }
     }
+    
+    // Resposta padrão caso não tenha API configurada ou ocorra erro
+    return 'Obrigado por sua mensagem! Se estiver interessado em nossos produtos, digite o nome do produto ou use o comando !ajuda para ver os comandos disponíveis.';
 }
 
+// Rota para verificação de saúde do servidor (importante para o Render)
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
+// Inicializa o servidor express
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor Express rodando na porta ${PORT}`);
+});
+
 // Inicializa o cliente WhatsApp
-client.initialize();
+client.initialize().catch(err => {
+    logger.error('Erro ao inicializar o cliente WhatsApp:', err);
+    console.error('Erro ao inicializar o cliente WhatsApp:', err);
+});
