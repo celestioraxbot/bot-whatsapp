@@ -1,10 +1,7 @@
 require('dotenv').config(); // Carregar variáveis de ambiente
-const { Client, LocalAuth } = require('whatsapp-web.js');
-const puppeteer = require('puppeteer');
-const qrcode = require('qrcode-terminal');
+const { create } = require('venom-bot'); // Importa o Venom-bot
 const axios = require('axios');
 const fs = require('fs');
-const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto'); // Para criptografia
@@ -25,7 +22,7 @@ const conversationHistory = {};
 const MAX_HISTORY_LENGTH = 10;
 
 // Configuração da pasta de logs
-const logsDir = path.join(__dirname, 'logs');
+const logsDir = './logs';
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });
 }
@@ -39,53 +36,21 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console({ format: winston.format.simple() }),
-    new winston.transports.File({ filename: path.join(logsDir, 'error.log'), level: 'error' }),
-    new winston.transports.File({ filename: path.join(logsDir, 'combined.log') }),
+    new winston.transports.File({ filename: `${logsDir}/error.log`, level: 'error' }),
+    new winston.transports.File({ filename: `${logsDir}/combined.log` }),
   ],
 });
 
-// Configuração do cliente WhatsApp
-const client = new Client({
-  authStrategy: new LocalAuth({ clientId: 'qwen' }),
-  puppeteer: {
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    executablePath:
-      process.env.NODE_ENV === 'production'
-        ? '/usr/bin/chromium-browser'
-        : process.env.CHROME_PATH || undefined,
-  },
-});
+// Função para criar o cliente Venom-bot
+create({
+  session: 'bot-session', // Nome da sessão (pode ser qualquer nome)
+  disableWelcome: true, // Desativa mensagens de boas-vindas
+})
+  .then((client) => start(client))
+  .catch((erro) => console.error('Erro ao iniciar o bot:', erro));
 
-// Função para iniciar o navegador - corrigida com async/await
-async function startBrowser() {
-  try {
-    const browserOptions = {
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-      headless: true,
-    };
-    if (process.env.NODE_ENV === 'production') {
-      browserOptions.executablePath = '/usr/bin/chromium-browser';
-    } else {
-      browserOptions.executablePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-    }
-    const browser = await puppeteer.launch(browserOptions);
-    console.log("Navegador iniciado com sucesso!");
-    return browser;
-  } catch (error) {
-    console.error('Erro ao iniciar o navegador:', error);
-    throw error;
-  }
-}
-
-// Função para enviar QR Code
-client.on('qr', (qr) => {
-  console.log('Escaneie o QR Code abaixo para conectar:');
-  qrcode.generate(qr, { small: true });
-});
-
-// Ação quando o cliente WhatsApp estiver pronto
-client.on('ready', () => {
+// Função principal para iniciar o bot
+function start(client) {
   console.log('Bot conectado e pronto para uso!');
   logger.info('Bot conectado e pronto para uso.');
 
@@ -98,81 +63,77 @@ client.on('ready', () => {
   setInterval(async () => {
     await recoverAbandonedLeads(client);
   }, 60 * 60 * 1000); // 1 hora
-});
 
-// Função para processar mensagens recebidas
-client.on('message', async (message) => {
-  const text = message.body.trim().toLowerCase();
-  const chat = await message.getChat();
+  // Processa mensagens recebidas
+  client.onMessage(async (message) => {
+    const text = message.body.trim().toLowerCase();
 
-  // Comandos especiais
-  if (text === '!limpeza') {
-    await handleCleanupCommand(message);
-    return;
-  }
-  if (text === '!relatorio') {
-    await handleReportCommand(message);
-    return;
-  }
-  if (text.startsWith('!group')) {
-    await handleGroupCommand(message);
-    return;
-  }
-  if (text.startsWith('!conhecimento')) {
-    await handleKnowledgeCommand(message);
-    return;
-  }
-  if (text === '!ajuda') {
-    await handleHelpCommand(message);
-    return;
-  }
-  if (text.startsWith('!sentimento')) {
-    await handleSentimentCommand(message);
-    return;
-  }
-  if (text.startsWith('!traduzir')) {
-    await handleTranslateCommand(message);
-    return;
-  }
-  if (text.startsWith('!ner')) {
-    await handleNerCommand(message);
-    return;
-  }
-  if (text.startsWith('!resumo')) {
-    await handleSummarizeCommand(message);
-    return;
-  }
-  if (text.startsWith('!gerar')) {
-    await handleGenerateTextCommand(message);
-    return;
-  }
-  if (text.startsWith('!imagem')) {
-    await handleImageRecognitionCommand(message);
-    return;
-  }
+    // Comandos especiais
+    if (text === '!limpeza') {
+      await handleCleanupCommand(client, message);
+      return;
+    }
+    if (text === '!relatorio') {
+      await handleReportCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!group')) {
+      await handleGroupCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!conhecimento')) {
+      await handleKnowledgeCommand(client, message);
+      return;
+    }
+    if (text === '!ajuda') {
+      await handleHelpCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!sentimento')) {
+      await handleSentimentCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!traduzir')) {
+      await handleTranslateCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!ner')) {
+      await handleNerCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!resumo')) {
+      await handleSummarizeCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!gerar')) {
+      await handleGenerateTextCommand(client, message);
+      return;
+    }
+    if (text.startsWith('!imagem')) {
+      await handleImageRecognitionCommand(client, message);
+      return;
+    }
 
-  // Processamento normal de mensagens
-  await processMessage(message);
-});
+    // Processamento normal de mensagens
+    await processMessage(client, message);
+  });
+}
 
 // Função para processar mensagens normais
-async function processMessage(message) {
+async function processMessage(client, message) {
   try {
-    const chat = await message.getChat();
-    await chat.sendStateTyping();
-
     let response;
-    if (message.hasMedia) {
-      const media = await message.downloadMedia();
-      if (media.mimetype.startsWith('audio')) {
-        const audioPath = `./media/${message.id.id}.mp3`;
-        fs.writeFileSync(audioPath, media.data);
+    if (message.isMedia) {
+      const mediaData = await client.decryptFile(message);
+      if (message.mimetype.startsWith('audio')) {
+        const audioPath = `./media/${message.id}.mp3`;
+        fs.writeFileSync(audioPath, mediaData);
         const transcript = await transcribeAudio(audioPath);
         deleteFile(audioPath);
         response = await processTextMessage(transcript, message.from);
-      } else if (media.mimetype.startsWith('image')) {
-        response = await processImage(media.data);
-      } else if (media.mimetype.startsWith('video')) {
+      } else if (message.mimetype.startsWith('image')) {
+        response = await processImage(mediaData);
+      } else if (message.mimetype.startsWith('video')) {
         response = '🎥 Desculpe, ainda não consigo processar vídeos.';
       } else {
         response = '📦 Formato de mídia não suportado.';
@@ -183,15 +144,15 @@ async function processMessage(message) {
       response = 'Olá! 😊 Como posso te ajudar hoje?';
     }
 
-    await message.reply(response);
+    await client.sendText(message.from, response);
   } catch (error) {
     logger.error('Erro ao processar mensagem:', error.message);
-    await message.reply('Desculpe, ocorreu um erro ao processar sua mensagem.');
+    await client.sendText(message.from, 'Desculpe, ocorreu um erro ao processar sua mensagem.');
   }
 }
 
 // Funções de comandos
-async function handleCleanupCommand(message) {
+async function handleCleanupCommand(client, message) {
   try {
     const tempDir = './temp'; // Diretório de arquivos temporários
     const logDir = './logs'; // Diretório de logs
@@ -224,10 +185,10 @@ async function handleCleanupCommand(message) {
     let response = `🧹 Relatório de Limpeza:\n`;
     response += `- Total de itens limpos: ${cleanedFiles.length}\n`;
     response += `- Itens limpos:\n${cleanedFiles.join('\n') || 'Nenhum item foi limpo.'}`;
-    await message.reply(response);
+    await client.sendText(message.from, response);
   } catch (error) {
     logger.error('Erro ao processar o comando !limpeza:', error.message);
-    await message.reply('Desculpe, ocorreu um erro ao processar o comando de limpeza.');
+    await client.sendText(message.from, 'Desculpe, ocorreu um erro ao processar o comando de limpeza.');
   }
 }
 
@@ -235,26 +196,12 @@ async function handleCleanupCommand(message) {
 // ...
 
 // Função auxiliar para aguardar uma resposta do usuário
-async function waitForResponse(userId) {
+async function waitForResponse(client, userId) {
   return new Promise((resolve) => {
-    const listener = (message) => {
-      if (message.from === userId && message.body.trim() !== '') {
-        client.off('message', listener); // Remove o ouvinte após receber a resposta
-        resolve(message.body.trim());
-      }
-    };
-    client.on('message', listener);
-  });
-}
-
-// Função auxiliar para aguardar mídia do usuário
-async function waitForMedia(userId) {
-  return new Promise((resolve) => {
-    const listener = async (message) => {
-      if (message.from === userId && message.hasMedia) {
-        const media = await message.downloadMedia();
-        client.off('message', listener); // Remove o ouvinte após receber a mídia
-        resolve(media);
+    const listener = (response) => {
+      if (response.from === userId && response.body.trim() !== '') {
+        client.removeListener('message', listener); // Remove o ouvinte após receber a resposta
+        resolve(response.body.trim());
       }
     };
     client.on('message', listener);
@@ -279,7 +226,7 @@ function deleteFile(filePath) {
 async function sendDetailedReport(client) {
   try {
     const encryptedReport = encryptReport();
-    await client.sendMessage(process.env.REPORT_PHONE_NUMBER, `🔒 Relatório Criptografado:\n${encryptedReport}`);
+    await client.sendText(process.env.REPORT_PHONE_NUMBER, `🔒 Relatório Criptografado:\n${encryptedReport}`);
     logger.info('Relatório enviado com sucesso.');
   } catch (error) {
     logger.error('Erro ao enviar relatório:', error.message);
@@ -310,7 +257,7 @@ async function recoverAbandonedLeads(client) {
     if (timeElapsed > 24 * 60 * 60 * 1000) { // 24 horas sem resposta
       const productInfo = productDetails[lead.product];
       const recoveryMessage = `🌟 Olá! Vi que você estava interessado no produto "${lead.product}". Aqui está o link novamente: ${productInfo.link}. Não perca essa oportunidade! 😊`;
-      await client.sendMessage(userId, recoveryMessage);
+      await client.sendText(userId, recoveryMessage);
       delete abandonedLeads[userId];
       logger.info(`Lead recuperado para o usuário: ${userId}`);
     }
@@ -329,7 +276,7 @@ app.post('/webhook', async (req, res) => {
 
     switch (eventType) {
       case 'aguardando_pagamento':
-        await client.sendMessage(customerPhone, `⏳ Seu pagamento para o produto "${productName}" está pendente. Por favor, finalize o pagamento para garantir sua compra.`);
+        await client.sendText(customerPhone, `⏳ Seu pagamento para o produto "${productName}" está pendente. Por favor, finalize o pagamento para garantir sua compra.`);
         pendingPayments++;
         break;
 
@@ -353,6 +300,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   logger.info(`Servidor rodando na porta ${PORT}`);
 });
-
-// Inicializa o cliente WhatsApp
-client.initialize();

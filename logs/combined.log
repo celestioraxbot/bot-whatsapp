@@ -63,3 +63,4 @@
 {"level":"info","message":"Mensagem recebida de 554797377750@c.us: olá, tudo bem?","timestamp":"2025-02-24T03:57:24.152Z"}
 {"level":"error","message":"Erro ao usar API de IA:","timestamp":"2025-02-24T03:57:25.275Z"}
 {"level":"info","message":"Bot conectado e pronto para uso.","timestamp":"2025-02-24T04:12:08.390Z"}
+{"level":"info","message":"Servidor rodando na porta 3000","timestamp":"2025-02-25T02:50:55.402Z"}
