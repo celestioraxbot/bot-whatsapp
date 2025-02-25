@@ -22,8 +22,9 @@ RUN apt-get update && apt-get upgrade -y && \
     udev \
     dbus-x11 \
     mesa-utils \
-    xvfb && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    xvfb \
+    xauth && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*  # Corrigido aqui, sem quebra de linha
 
 # Define diretório de trabalho
 WORKDIR /app
