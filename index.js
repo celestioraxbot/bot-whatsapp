@@ -22,9 +22,8 @@ async function startBrowser() {
       headless: true,
     };
 
-    // Define o caminho do navegador com base no ambiente
     if (process.env.NODE_ENV === 'production') {
-      browserOptions.executablePath = '/usr/bin/chromium-browser'; // Caminho usado no Dockerfile
+      browserOptions.executablePath = '/usr/bin/chromium-browser'; 
     } else {
       browserOptions.executablePath = process.env.CHROME_PATH || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     }
@@ -47,54 +46,13 @@ let qualifiedLeads = 0;
 const abandonedLeads = {};
 const conversationHistory = {};
 const MAX_HISTORY_LENGTH = 10;
-let checkoutLink = process.env.CHECKOUT_LINK || 'https://seu-link-de-checkout.com'; // Link de checkout padrão
+let checkoutLink = process.env.CHECKOUT_LINK || 'https://seu-link-de-checkout.com';
 
 // Conhecimento sobre produtos
 const productKnowledge = {
-  "cérebro em alta performance": {
-    description: "Um e-book onde ajudará a melhorar a sua questão neuronal do cérebro e melhor cada dia a mais para ter uma vida saudável.",
-    link: "https://renovacaocosmica.shop/23/crb-fnl"
-  },
-  "corpo e mente": {
-    description: "Recupere o equilíbrio físico e emocional com um método natural e eficaz.",
-    link: "https://renovacaocosmica.shop/23/crpint-fnl"
-  },
-  "saúde imersiva": {
-    description: "O futuro em suas mãos: cuide-se com dispositivos vestíveis e realidade aumentada. Experimente a revolução da saúde.",
-    link: "https://renovacaocosmica.shop/23/fnl-imersiva"
-  },
-  "saúde do amanhã": {
-    description: "Tecnologia de saúde inovadora para cuidar de você. Cuide da sua saúde com tecnologias avançadas.",
-    link: "https://renovacaocosmica.shop/23/fnl-saude"
-  },
-  "sono profundo, vida renovada": {
-    description: "Recupere-se enquanto dorme com sono profundo. Pare de se preocupar com noites mal dormidas.",
-    link: "https://renovacaocosmica.shop/23/sono-fnl"
-  },
-  "rosa xantina": {
-    description: "Você merece ter uma pele radiante e saudável todos os dias! Com uma fórmula poderosa e inovadora, o Rosa Xantina é o segredo para uma pele deslumbrante.",
-    link: "https://ev.braip.com/ref?pv=pro9y44w&af=afijp7y0qm"
-  },
-  "os alongamentos essenciais": {
-    description: "Melhore sua flexibilidade e alivie as tensões com 15 minutos diários! Alongamentos simples para fazer em casa e aliviar as tensões.",
-    link: "https://renovacaocosmica.shop/23/alg-fnl"
-  },
-  "renavidiol cba": {
-    description: "Descubra o poder do Canabinoid Active System™. A tecnologia que restaura a beleza da sua pele logo nas primeiras aplicações!",
-    link: "https://ev.braip.com/ref?pv=pro173dg&af=afimex7zn1"
-  },
-  "nervocure": {
-    description: "Conquiste uma vida sem dores de forma 100% segura e comprovada. Auxílio na diminuição das dores, queimação, formigamentos, agulhadas, choques e dormência.",
-    link: "https://renovacaocosmica.shop/23/nervocuretic"
-  },
-  "100queda": {
-    description: "Trinoxidil Americano! O único tratamento do mundo capaz de restaurar até 2.000 fios de cabelo por semana!",
-    link: "https://ev.braip.com/ref?pv=pro4rxm7&af=afivpggv51"
-  },
-  "hemogotas": {
-    description: "O único tratamento natural que age de dentro para fora com tecnologia americana avançada. Alívio rápido e duradouro para hemorróidas.",
-    link: "https://ev.braip.com/ref?pv=pror2eex&af=afilxjyn16"
-  }
+  "cérebro em alta performance": { description: "Descrição do produto", link: "https://link.com" },
+  "corpo e mente": { description: "Descrição do produto", link: "https://link.com" },
+  // Adicione os outros produtos aqui
 };
 
 // Configuração da pasta de logs
@@ -124,7 +82,7 @@ const client = new Client({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     executablePath: process.env.NODE_ENV === 'production'
-      ? '/usr/bin/chromium-browser' // Caminho usado no Dockerfile
+      ? '/usr/bin/chromium-browser' 
       : process.env.CHROME_PATH || undefined
   }
 });
@@ -141,28 +99,45 @@ client.on('ready', () => {
   logger.info('Bot conectado e pronto para uso.');
 });
 
+// Função de limpeza
+function handleCleanupCommand(message) {
+  message.reply("Função de limpeza ainda não foi implementada.");
+}
+
+// Função de relatório
+function handleReportCommand(message) {
+  message.reply("🔹 Relatório solicitado! Em breve você receberá as informações.");
+}
+
+// Função de resumo para grupos
+async function handleGroupSummaryCommand(message, groupName) {
+  const group = await client.getGroupByName(groupName);
+  if (!group) {
+    await message.reply(`❌ Não encontrei o grupo com o nome "${groupName}".`);
+    return;
+  }
+
+  const groupSummary = `🔹 Nome do grupo: ${group.name}\n🔹 Participantes: ${group.participants.length}`;
+  await message.reply(groupSummary);
+}
+
 // Mapeamento de comandos
 const commands = {
-  '!limpeza': handleCleanupCommand, // '!limpeza': handleCleanupCommand,
+  '!limpeza': handleCleanupCommand,
   '!relatorio': handleReportCommand,
-  '!grupo': handleGroupListCommand, // Novo comando para listar grupos
-  '!group': handleGroupSummaryCommand, // Novo comando para resumo de grupo
+  '!grupo': handleGroupListCommand,
+  '!group': handleGroupSummaryCommand,
   '!conhecimento': handleKnowledgeCommand,
   '!ajuda': handleHelpCommand,
-  '!comandos': handleHelpCommand, // Alias para !ajuda
+  '!comandos': handleHelpCommand,
   '!sentimento': handleSentimentCommand,
   '!traduzir': handleTranslateCommand,
   '!ner': handleNerCommand,
   '!resumo': handleSummarizeCommand,
   '!gerar': handleGenerateTextCommand,
   '!imagem': handleImageRecognitionCommand,
-  '!gerenciador': handleAdManagerCommand, // Novo comando para o Gerenciador de Anúncios
+  '!gerenciador': handleAdManagerCommand,
 };
-
-// Função de limpeza (não implementada)
-function handleCleanupCommand(message) {
-  message.reply("Função de limpeza ainda não foi implementada.");
-}
 
 // Processamento de mensagens
 client.on('message', async (message) => {
@@ -175,7 +150,6 @@ client.on('message', async (message) => {
       return;
     }
 
-    // Trata o comando !group
     if (text.startsWith('!group')) {
       const groupName = text.split(' ').slice(1).join(' ');
       if (!groupName) {
@@ -231,18 +205,6 @@ async function fetchAdMetrics() {
     logger.error('Erro ao buscar métricas de anúncios:', error.message);
     return null;
   }
-}
-
-// Função de resumo para grupos
-async function handleGroupSummaryCommand(message, groupName) {
-  const group = await client.getGroupByName(groupName);
-  if (!group) {
-    await message.reply(`❌ Não encontrei o grupo com o nome "${groupName}".`);
-    return;
-  }
-
-  const groupSummary = `🔹 Nome do grupo: ${group.name}\n🔹 Participantes: ${group.participants.length}`;
-  await message.reply(groupSummary);
 }
 
 app.listen(3000, () => {
