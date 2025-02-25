@@ -159,8 +159,9 @@ const commands = {
   '!gerenciador': handleAdManagerCommand, // Novo comando para o Gerenciador de Anúncios
 };
 
+// Função de limpeza (não implementada)
 function handleCleanupCommand(message) {
-    message.reply("Função de limpeza ainda não foi implementada.");
+  message.reply("Função de limpeza ainda não foi implementada.");
 }
 
 // Processamento de mensagens
@@ -218,136 +219,32 @@ function deleteFile(filePath) {
   }
 }
 
-// Função para buscar métricas do Gerenciador de Anúncios via Hugging Face
-async function fetchAdManagerMetrics() {
+// Função para buscar métricas do Gerenciador de Anúncios
+async function fetchAdMetrics() {
   try {
-    const response = await axios.get(process.env.FB_ADS_API_URL || 'https://api-inference.huggingface.co/models/facebook-ad-metrics', {
-      headers: {
-        'Authorization': `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`
-      }
+    const response = await axios.get('https://api.facebook.com/admetrics', {
+      headers: { 'Authorization': `Bearer ${process.env.FACEBOOK_ACCESS_TOKEN}` }
     });
-
-    return response.data;
+    const metrics = response.data;
+    return metrics;
   } catch (error) {
-    logger.error('Erro ao buscar métricas do Gerenciador de Anúncios:', error.message);
-    throw new Error('Não foi possível obter as métricas do Gerenciador de Anúncios.');
+    logger.error('Erro ao buscar métricas de anúncios:', error.message);
+    return null;
   }
 }
 
-// Função para buscar métricas do Gerenciador de Anúncios via Hugging Face
-async function fetchAdManagerMetrics() {
-  try {
-    const response = await axios.get(process.env.FB_ADS_API_URL || 'https://api-inference.huggingface.co/models/facebook-ad-metrics', {
-      headers: {
-        'Authorization': `Bearer ${process.env.HUGGINGFACE_API_TOKEN}`
-      }
-    });
-
-    return response.data;
-  } catch (error) {
-    logger.error('Erro ao buscar métricas do Gerenciador de Anúncios:', error.message);
-    throw new Error('Não foi possível obter as métricas do Gerenciador de Anúncios.');
-  }
-}
-
-// Implementação dos comandos
-async function handleAdManagerCommand(message) {
-  try {
-    await message.reply('🔄 Buscando métricas do Gerenciador de Anúncios do Facebook...');
-    const metrics = await fetchAdManagerMetrics();
-
-    let response = `📊 *MÉTRICAS DO GERENCIADOR DE ANÚNCIOS*\n\n`;
-    if (metrics) {
-      response += `📈 *Performance*\n`;
-      response += `- Impressões: ${metrics.impressions || 'N/A'}\n`;
-      response += `- Alcance: ${metrics.reach || 'N/A'}\n`;
-      response += `- Cliques: ${metrics.clicks || 'N/A'}\n`;
-      response += `- CTR: ${metrics.ctr || 'N/A'}%\n\n`;
-
-      response += `💰 *Custos*\n`;
-      response += `- Custo total: R$ ${metrics.cost || 'N/A'}\n`;
-      response += `- CPC médio: R$ ${metrics.cpc || 'N/A'}\n`;
-      response += `- CPM: R$ ${metrics.cpm || 'N/A'}\n\n`;
-
-      response += `🎯 *Conversões*\n`;
-      response += `- Total de conversões: ${metrics.conversions || 'N/A'}\n`;
-      response += `- Custo por conversão: R$ ${metrics.cost_per_conversion || 'N/A'}\n`;
-
-      if (metrics.recommendations && metrics.recommendations.length > 0) {
-        response += `\n💡 *Recomendações*\n`;
-        metrics.recommendations.forEach((rec, index) => {
-          response += `${index + 1}. ${rec}\n`;
-        });
-      }
-    } else {
-      response += `❌ Não foi possível obter as métricas no momento. Tente novamente mais tarde.`;
-    }
-
-    await message.reply(response);
-  } catch (error) {
-    logger.error('Erro ao processar o comando !gerenciador:', error.message);
-    await message.reply('Desculpe, ocorreu um erro ao buscar as métricas do Gerenciador de Anúncios. Tente novamente mais tarde.');
-  }
-}
-
-// Novas funções para gerenciar grupos
-async function handleGroupListCommand(message) {
-  try {
-    const chats = await client.getChats();
-    const groups = chats.filter(chat => chat.isGroup);
-
-    if (groups.length === 0) {
-      await message.reply('❌ O bot não está em nenhum grupo no momento.');
-      return;
-    }
-
-    let response = '👥 *Grupos em que o bot está adicionado:*\n\n';
-    groups.forEach((group, index) => {
-      response += `${index + 1}. ${group.name} (${group.id.user})\n`;
-    });
-
-    await message.reply(response);
-  } catch (error) {
-    logger.error('Erro ao processar o comando !grupo:', error.message);
-    await message.reply('Desculpe, ocorreu um erro ao listar os grupos.');
-  }
-}
-
+// Função de resumo para grupos
 async function handleGroupSummaryCommand(message, groupName) {
-  try {
-    const chats = await client.getChats();
-    const group = chats.find(chat => chat.isGroup && chat.name.toLowerCase() === groupName.toLowerCase());
-
-    if (!group) {
-      await message.reply(`❌ Grupo "${groupName}" não encontrado.`);
-      return;
-    }
-
-    const messages = await group.fetchMessages({ limit: 50 }); // Limita a 50 mensagens recentes
-    const summary = generateGroupSummary(messages);
-
-    await message.reply(summary);
-  } catch (error) {
-    logger.error('Erro ao processar o comando !group:', error.message);
-    await message.reply('Desculpe, ocorreu um erro ao gerar o resumo do grupo.');
+  const group = await client.getGroupByName(groupName);
+  if (!group) {
+    await message.reply(`❌ Não encontrei o grupo com o nome "${groupName}".`);
+    return;
   }
+
+  const groupSummary = `🔹 Nome do grupo: ${group.name}\n🔹 Participantes: ${group.participants.length}`;
+  await message.reply(groupSummary);
 }
 
-function generateGroupSummary(messages) {
-  const messageCount = messages.length;
-  const uniqueUsers = new Set(messages.map(msg => msg.author));
-  const mostActiveUser = messages.reduce((acc, msg) => {
-    acc[msg.author] = (acc[msg.author] || 0) + 1;
-    return acc;
-  }, {});
-
-  const sortedUsers = Object.entries(mostActiveUser).sort((a, b) => b[1] - a[1]);
-  const topUser = sortedUsers.length > 0 ? sortedUsers[0][0] : 'N/A';
-
-  let summary = `📊 *Resumo do Grupo*\n\n`;
-  summary += `- Total de mensagens analisadas: ${messageCount}\n`;
-  summary += `- Usuários únicos: ${uniqueUsers.size}\n`;
-  summary += `- Usuário mais ativo: ${topUser}\n`;
-
-  return summary;
-}
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
