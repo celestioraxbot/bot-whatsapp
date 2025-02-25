@@ -12,15 +12,18 @@ apt-get update && apt-get install -y \
     libnss3 \
     libxss1 \
     xdg-utils \
-    libx11-xcb1
+    libx11-xcb1 \
+    libx11-dev
 
 # Baixa o Chromium manualmente
 echo "Baixando Chromium..."
 wget https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1208972/chrome-linux.zip
 unzip chrome-linux.zip -d /usr/local/
+
+# Define o caminho do Chromium para o venom-bot e puppeteer
 export VENOM_CHROME_PATH=/usr/local/chrome-linux/chrome
 
-# Instala as dependências do Node.js
+# Atualiza e instala as dependências do Node.js
 npm install
 
 # Limpa o cache do APT para reduzir o tamanho da imagem (opcional)
