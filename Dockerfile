@@ -1,12 +1,24 @@
-# Usando a imagem oficial do Node.js como base (Debian Bullseye)
-FROM node:18-bullseye
+# Etapa 1: Build - Instala dependências sem poluir a imagem final
+FROM node:18-slim AS builder
 
-# Configuração de variáveis de ambiente
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PORT=3000
+# Define o diretório de trabalho
+WORKDIR /app
 
-# Atualiza os repositórios e instala dependências essenciais para o Playwright e Chromium
+# Copia apenas os arquivos necessários para instalação das dependências
+COPY package*.json ./
+
+# Instala apenas as dependências necessárias para produção
+RUN npm ci --production && rm -rf /root/.npm
+
+# Etapa 2: Final - Usa uma imagem leve e segura para rodar o bot
+FROM node:18-slim
+
+# Definição de variáveis de ambiente
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PORT=3000
+
+# Instala pacotes mínimos necessários para o Chromium rodar corretamente
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     ca-certificates \
@@ -25,27 +37,22 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xauth && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Define diretório de trabalho
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copiar package.json e package-lock.json para o contêiner
-COPY package*.json ./
-
-# Instalar dependências do projeto
-RUN npm ci --production && rm -rf /root/.npm
-
-# Instalar dependências específicas do Playwright
-RUN npx playwright install --with-deps chromium
-
-# Copiar o código-fonte do seu projeto para o contêiner
+# Copia apenas os arquivos essenciais da etapa anterior
+COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 
-# Criar usuário não root para maior segurança
+# Instala dependências específicas do Playwright
+RUN npx playwright install --with-deps chromium
+
+# Cria um usuário não root para segurança
 RUN groupadd --system appgroup && useradd --system --no-create-home --group appgroup appuser
 USER appuser
 
-# Expor a porta que o Express usará
-EXPOSE ${PORT:-3000}
+# Expor a porta utilizada pelo bot
+EXPOSE ${PORT}
 
-# Comando para rodar seu servidor com Xvfb (necessário para ambientes headless)
+# Comando para iniciar o bot
 CMD ["xvfb-run", "node", "index.js"]
