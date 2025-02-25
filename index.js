@@ -43,15 +43,16 @@ const logger = winston.createLogger({
 
 // Função para criar o cliente Venom-bot
 create({
-  session: 'bot-session', // Nome da sessão (pode ser qualquer nome)
+  session: 'bot-session', // Nome da sessão
   disableWelcome: true, // Desativa mensagens de boas-vindas
+  browserArgs: ['--no-sandbox', '--disable-setuid-sandbox'], // Argumentos para o navegador
   useChrome: false, // Desativa o uso do Chrome
   chromiumVersion: 'system', // Usa o Chromium instalado no sistema
   executablePath: process.env.VENOM_CHROME_PATH || '/usr/bin/chromium', // Caminho do Chromium
 })
   .then((client) => start(client))
   .catch((erro) => console.error('Erro ao iniciar o bot:', erro));
-
+  
 // Função principal para iniciar o bot
 function start(client) {
   console.log('Bot conectado e pronto para uso!');

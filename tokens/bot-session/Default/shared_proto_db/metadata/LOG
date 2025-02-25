@@ -1,2 +1,3 @@
-2025/02/24-23:50:59.617 2ed0 Creating DB C:\Users\User\Desktop\BOT-WHATSAZAPP\bot-whatsapp\tokens\bot-session\Default\shared_proto_db\metadata since it was missing.
-2025/02/24-23:50:59.626 2ed0 Reusing MANIFEST C:\Users\User\Desktop\BOT-WHATSAZAPP\bot-whatsapp\tokens\bot-session\Default\shared_proto_db\metadata/MANIFEST-000001
+2025/02/25-00:08:17.603 2984 Reusing MANIFEST C:\Users\User\Desktop\BOT-WHATSAZAPP\bot-whatsapp\tokens\bot-session\Default\shared_proto_db\metadata/MANIFEST-000001
+2025/02/25-00:08:17.603 2984 Recovering log #3
+2025/02/25-00:08:17.604 2984 Reusing old log C:\Users\User\Desktop\BOT-WHATSAZAPP\bot-whatsapp\tokens\bot-session\Default\shared_proto_db\metadata/000003.log 
