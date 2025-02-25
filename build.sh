@@ -13,18 +13,12 @@ apt-get update && apt-get install -y \
     libxss1 \
     xdg-utils \
     libx11-xcb1 \
-    chromium-browser
+    chromium
 
-# Define a variável de ambiente para o Puppeteer usar o Chromium instalado
-export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-echo "Variável PUPPETEER_EXECUTABLE_PATH definida como: $PUPPETEER_EXECUTABLE_PATH"
+# Define a variável de ambiente para o Venom-bot usar o Chromium instalado
+export VENOM_CHROME_PATH=/usr/bin/chromium
 
-# Instala as dependências do Node.js sem baixar o Chromium automaticamente
-echo "Instalando Puppeteer sem download automático do Chromium..."
-npm install puppeteer --ignore-scripts
-
-# Instala as demais dependências do projeto
-echo "Instalando dependências do projeto..."
+# Instala as dependências do Node.js
 npm install
 
 # Limpa o cache do APT para reduzir o tamanho da imagem (opcional)

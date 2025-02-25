@@ -45,6 +45,9 @@ const logger = winston.createLogger({
 create({
   session: 'bot-session', // Nome da sessão (pode ser qualquer nome)
   disableWelcome: true, // Desativa mensagens de boas-vindas
+  useChrome: false, // Desativa o uso do Chrome
+  chromiumVersion: 'system', // Usa o Chromium instalado no sistema
+  executablePath: process.env.VENOM_CHROME_PATH || '/usr/bin/chromium', // Caminho do Chromium
 })
   .then((client) => start(client))
   .catch((erro) => console.error('Erro ao iniciar o bot:', erro));
