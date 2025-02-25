@@ -143,7 +143,7 @@ client.on('ready', () => {
 
 // Mapeamento de comandos
 const commands = {
-  '!limpeza': handleCleanupCommand,
+  '!limpeza': handleCleanupCommand, // '!limpeza': handleCleanupCommand,
   '!relatorio': handleReportCommand,
   '!grupo': handleGroupListCommand, // Novo comando para listar grupos
   '!group': handleGroupSummaryCommand, // Novo comando para resumo de grupo
@@ -158,6 +158,10 @@ const commands = {
   '!imagem': handleImageRecognitionCommand,
   '!gerenciador': handleAdManagerCommand, // Novo comando para o Gerenciador de Anúncios
 };
+
+function handleCleanupCommand(message) {
+    message.reply("Função de limpeza ainda não foi implementada.");
+}
 
 // Processamento de mensagens
 client.on('message', async (message) => {
