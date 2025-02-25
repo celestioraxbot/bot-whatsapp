@@ -125,7 +125,6 @@ async function handleGroupSummaryCommand(message, groupName) {
 const commands = {
   '!limpeza': handleCleanupCommand,
   '!relatorio': handleReportCommand,
-  '!grupo': handleGroupListCommand,
   '!group': handleGroupSummaryCommand,
   '!conhecimento': handleKnowledgeCommand,
   '!ajuda': handleHelpCommand,
@@ -206,18 +205,6 @@ async function fetchAdMetrics() {
     return null;
   }
 }
-
-// Endpoints de API para interações
-app.post('/message', async (req, res) => {
-  try {
-    const { phone, message } = req.body;
-    const chat = await client.getChatById(phone);
-    await chat.sendMessage(message);
-    res.status(200).send({ status: 'Mensagem enviada com sucesso' });
-  } catch (error) {
-    res.status(500).send({ error: 'Erro ao enviar a mensagem' });
-  }
-});
 
 app.listen(3000, () => {
   console.log('Server running on port 3000');
