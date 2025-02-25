@@ -1,23 +1,29 @@
-# Usando a imagem oficial do Node.js como base
-FROM node:18-alpine
+# Usando a imagem oficial do Node.js como base (Debian Bullseye)
+FROM node:18-bullseye
 
-# Atualiza os repositórios e instala dependências essenciais para o Playwright
-RUN apk update && \
-    apk add --no-cache \
+# Configuração de variáveis de ambiente
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PORT=3000
+
+# Atualiza os repositórios e instala dependências essenciais para o Playwright e Chromium
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
     ca-certificates \
     fontconfig \
-    libx11 \
-    libxcomposite \
-    libxrandr \
-    gtk+3.0 \
-    mesa-gl \
-    alsa-lib \
-    vulkan-loader \
-    xdg-utils
+    libx11-6 \
+    libxcomposite1 \
+    libxrandr2 \
+    libgtk-3-0 \
+    libgl1-mesa-glx \
+    alsa-utils \
+    xdg-utils \
+    udev \
+    dbus-x11 \
+    mesa-utils \
+    xvfb && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Define diretório de trabalho
 WORKDIR /app
@@ -26,7 +32,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instalar dependências do projeto
-RUN npm install --production
+RUN npm ci --production && rm -rf /root/.npm
 
 # Instalar dependências específicas do Playwright
 RUN npx playwright install --with-deps chromium
@@ -34,8 +40,12 @@ RUN npx playwright install --with-deps chromium
 # Copiar o código-fonte do seu projeto para o contêiner
 COPY . .
 
-# Expor a porta que o Express usará
-EXPOSE 3000
+# Criar usuário não root para maior segurança
+RUN groupadd --system appgroup && useradd --system --no-create-home --group appgroup appuser
+USER appuser
 
-# Comando para rodar seu servidor
-CMD ["npm", "start"]
+# Expor a porta que o Express usará
+EXPOSE ${PORT:-3000}
+
+# Comando para rodar seu servidor com Xvfb (necessário para ambientes headless)
+CMD ["xvfb-run", "node", "index.js"]
