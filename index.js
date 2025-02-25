@@ -247,7 +247,7 @@ function encryptReport() {
 - Abandono de Checkout: ${abandonedCheckouts}
 - Pagamentos Pendentes: ${pendingPayments}`;
 
-  const cipher = crypto.createCipher('aes-256-cbc', process.env.ENCRYPTION_SECRET_KEY);
+  const cipher = crypto.createCipheriv('aes-256-cbc', process.env.CRYPTO_KEY, process.env.CRYPTO_IV);
   let encrypted = cipher.update(reportMessage, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return encrypted;
@@ -255,52 +255,33 @@ function encryptReport() {
 
 // Função para recuperar leads abandonados
 async function recoverAbandonedLeads(client) {
-  const now = Date.now();
-  for (const [userId, lead] of Object.entries(abandonedLeads)) {
-    const timeElapsed = now - lead.timestamp;
-    if (timeElapsed > 24 * 60 * 60 * 1000) { // 24 horas sem resposta
-      const productInfo = productDetails[lead.product];
-      const recoveryMessage = `🌟 Olá! Vi que você estava interessado no produto "${lead.product}". Aqui está o link novamente: ${productInfo.link}. Não perca essa oportunidade! 😊`;
-      await client.sendText(userId, recoveryMessage);
-      delete abandonedLeads[userId];
-      logger.info(`Lead recuperado para o usuário: ${userId}`);
+  try {
+    for (const [userId, lead] of Object.entries(abandonedLeads)) {
+      const timeElapsed = Date.now() - lead.timestamp;
+      if (timeElapsed > 24 * 60 * 60 * 1000) { // 24 horas
+        delete abandonedLeads[userId]; // Remove leads que passaram 24 horas
+      } else {
+        const recoveryMessage = `👋 Olá! Vimos que você não concluiu a sua compra. Estamos aqui para te ajudar! Se precisar de qualquer coisa, estamos à disposição.`;
+        await client.sendText(userId, recoveryMessage);
+      }
     }
+  } catch (error) {
+    logger.error('Erro ao recuperar leads abandonados:', error.message);
   }
 }
 
-// Processa os diferentes tipos de eventos recebidos no webhook
-app.post('/webhook', async (req, res) => {
-  try {
-    const event = req.body; // O corpo da solicitação contém os dados do evento
-    logger.info('Evento recebido:', event);
-
-    const eventType = event.type;
-    const customerPhone = event.customer_phone;
-    const productName = event.product_name;
-
-    switch (eventType) {
-      case 'aguardando_pagamento':
-        await client.sendText(customerPhone, `⏳ Seu pagamento para o produto "${productName}" está pendente. Por favor, finalize o pagamento para garantir sua compra.`);
-        pendingPayments++;
-        break;
-
-      // Outros casos de eventos implementados anteriormente
-      // ...
-
-      default:
-        logger.warn(`Tipo de evento desconhecido: ${eventType}`);
-        break;
-    }
-
-    res.status(200).send({ message: 'Webhook recebido com sucesso' });
-  } catch (error) {
-    logger.error('Erro ao processar o webhook:', error.message);
-    res.status(500).send({ error: 'Erro no processamento do webhook' });
+// Função para processar texto de mensagens
+async function processTextMessage(message, userId) {
+  let response = '';
+  if (message.includes('comprar')) {
+    response = `🛒 Parece que você quer comprar! Vamos te ajudar com isso.`;
+    totalSales += 1; // Incrementa o contador de vendas
+  } else if (message.includes('ajuda')) {
+    response = `💬 Como posso te ajudar?`;
+  } else {
+    response = `🤔 Eu não entendi. Poderia ser mais claro?`;
   }
-});
 
-// Inicializando o servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  logger.info(`Servidor rodando na porta ${PORT}`);
-});
+  interactionCount += 1;
+  return response;
+}

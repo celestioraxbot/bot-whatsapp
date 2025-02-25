@@ -4,7 +4,7 @@
   "description": "Bot para WhatsApp com integração de API",
   "main": "index.js",
   "scripts": {
-    "build": "./build.sh",
+    "build": "./build.sh", 
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",

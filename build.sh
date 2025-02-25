@@ -1,31 +1,14 @@
 #!/bin/bash
 
-# Atualiza os pacotes e instala as dependências necessárias (sem usar sudo)
-echo "Atualizando pacotes e instalando dependências..."
-apt-get update && apt-get install -y \
-    wget \
-    ca-certificates \
-    fonts-liberation \
-    libappindicator3-1 \
-    libasound2 \
-    libgdk-pixbuf2.0-0 \
-    libnss3 \
-    libxss1 \
-    xdg-utils \
-    libx11-xcb1
+# Atualiza dependências e configurações do ambiente
 
-# Baixa o Chromium manualmente (sem sudo)
-echo "Baixando Chromium..."
-wget https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1208972/chrome-linux.zip
-unzip chrome-linux.zip -d /usr/local/
-export VENOM_CHROME_PATH=/usr/local/chrome-linux/chrome
-
-# Instala as dependências do Node.js
+echo "Iniciando a instalação das dependências..."
 npm install
 
-# Limpa o cache do APT para reduzir o tamanho da imagem (opcional)
-echo "Limpando cache do APT..."
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+# Executar o script de build
+echo "Rodando o build..."
+npm run build
 
-echo "Build concluído com sucesso!"
+# Rodar o servidor em produção
+echo "Iniciando o servidor em produção..."
+npm run start

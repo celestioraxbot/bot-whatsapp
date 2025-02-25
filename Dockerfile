@@ -7,8 +7,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PORT=3000
 
 # Atualiza os repositórios e instala dependências essenciais para o Playwright e Chromium
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     ca-certificates \
     fontconfig \
@@ -24,7 +23,7 @@ RUN apt-get update && apt-get upgrade -y && \
     mesa-utils \
     xvfb \
     xauth && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*  # Corrigido aqui, sem quebra de linha
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Define diretório de trabalho
 WORKDIR /app
