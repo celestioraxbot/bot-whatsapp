@@ -1,5 +1,11 @@
+# Ignore node_modules
 node_modules
 npm-debug.log
-Dockerfile
-.dockerignore
-.git
+.DS_Store
+logs
+temp
+media
+.env
+.vscode
+.docker
+docker-compose.override.yml

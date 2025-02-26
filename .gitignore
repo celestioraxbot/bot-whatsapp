@@ -7,31 +7,20 @@ node_modules/
 # Ignorar arquivos de sistema
 .DS_Store
 Thumbs.db
-node_modules/
+
+# Ignorar variáveis de ambiente e diretórios de configuração
 .env
+.vscode/
+
+# Ignorar diretórios de logs, mídia e temporários
 logs/
 media/
 temp/
-*.log
 
-# Arquivos do Node.js
-node_modules/
+# Ignorar arquivos de depuração do npm
 npm-debug.log
 package-lock.json
 
-# Logs e diretórios temporários
-logs/
-temp/
-media/
-
-# Variáveis de ambiente
-.env
-
-# Docker
+# Ignorar arquivos e diretórios específicos do Docker
 .docker/
 docker-compose.override.yml
-
-# IDEs e sistemas operacionais
-.vscode/
-.DS_Store
-Thumbs.db

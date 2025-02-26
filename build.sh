@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Atualiza dependências e configurações do ambiente
-
 echo "Iniciando a instalação das dependências..."
 npm install
 

@@ -1,0 +1,42 @@
+# fly.toml app configuration file
+app = "bot-whatsapp-corrigido"  # Nome do seu aplicativo no Fly.io
+primary_region = "gru"  # Região principal onde o aplicativo será hospedado
+
+[build]
+  # Se você tiver um Dockerfile na raiz do seu projeto, é
+  # - importante que o Fly utilize esse Dockerfile para construir sua imagem.
+  # - Caso contrário, você pode especificar que não construa com o Fly
+  # - e use uma imagem Docker pública ou privada já existente.
+  
+[env]
+  NODE_ENV = "production"  # Define o ambiente como produção
+
+[http_service]
+  internal_port = 3000  # Porta interna que seu aplicativo escuta
+  force_https = true    # Força a conexão HTTPS
+  auto_stop_machines = "stop"  # Define para parar máquinas automaticamente
+  auto_start_machines = true     # Permite iniciar automaticamente as máquinas
+  min_machines_running = 1       # Uma máquina sempre deve estar rodando
+  processes = ["app"]            # Define o processo que será executado
+
+[[services]]
+  internal_port = 3000  # A mesma porta que o app escuta
+
+  [[services.ports]]
+    handlers = ["http"]  # Porta 80 para http
+    port = "80"          # Porta exposta
+
+  [[services.ports]]
+    handlers = ["tls", "http"]  # Porta 443 para https
+    port = "443"                 # Porta exposta
+
+  [[services.tcp_checks]]
+    interval = "15s"           # Intervalo para checar a saúde
+    timeout = "2s"             # Tempo limite para a checagem de saúde
+    grace_period = "1s"        # Período de graça antes de reiniciar um contêiner com falha
+    restart_limit = 0          # O número de reinicializações permitidas antes de considerar um erro
+
+[[vm]]
+  memory = "1gb"            # Memória alocada para sua VM
+  cpu_kind = "shared"       # Tipo de CPU usado
+  cpus = 1                  # Quantidade de CPUs alocadas

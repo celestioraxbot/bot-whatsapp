@@ -1,58 +1,52 @@
-# Etapa 1: Build - Instala dependências sem poluir a imagem final
-FROM node:18-slim AS builder
+# Use a imagem base do Node.js
+FROM node:18
 
-# Define o diretório de trabalho
-WORKDIR /app
+# Defina o diretório de trabalho no contêiner
+WORKDIR /usr/src/app
 
-# Copia apenas os arquivos necessários para instalação das dependências
+# Instale dependências do sistema necessárias para o Puppeteer
+RUN apt-get update && apt-get install -y \
+    wget \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    xdg-utils \
+    libu2f-udev \
+    libvulkan1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Baixe e instale o Chromium
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get update && apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb
+
+# Defina variáveis de ambiente necessárias para o Puppeteer
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
+# Copie o arquivo package.json e package-lock.json
 COPY package*.json ./
 
-# Instala apenas as dependências necessárias para produção
-RUN npm ci --production && rm -rf /root/.npm
+# Instale as dependências do Node.js
+RUN npm install
 
-# Etapa 2: Final - Usa uma imagem leve e segura para rodar o bot
-FROM node:18-slim
-
-# Definição de variáveis de ambiente
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PORT=3000
-
-# Instala pacotes mínimos necessários para o Chromium rodar corretamente
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
-    ca-certificates \
-    fontconfig \
-    libx11-6 \
-    libxcomposite1 \
-    libxrandr2 \
-    libgtk-3-0 \
-    libgl1-mesa-glx \
-    alsa-utils \
-    xdg-utils \
-    udev \
-    dbus-x11 \
-    mesa-utils \
-    xvfb \
-    xauth && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Define o diretório de trabalho
-WORKDIR /app
-
-# Copia apenas os arquivos essenciais da etapa anterior
-COPY --from=builder /app/node_modules ./node_modules
+# Copie o restante do código da aplicação
 COPY . .
 
-# Instala dependências específicas do Playwright
-RUN npx playwright install --with-deps chromium
+# Exponha a porta que a aplicação irá rodar
+EXPOSE 3000
 
-# Cria um usuário não root para segurança
-RUN groupadd --system appgroup && useradd --system --no-create-home --group appgroup appuser
-USER appuser
-
-# Expor a porta utilizada pelo bot
-EXPOSE ${PORT}
-
-# Comando para iniciar o bot
-CMD ["xvfb-run", "node", "index.js"]
+# Comando para rodar a aplicação
+CMD ["npm", "start"]

@@ -1,0 +1,13 @@
+image: node:18-alpine
+
+pipelines:
+  default:
+    - step:
+        name: Build and Test
+        caches:
+          - node
+        script:
+          - npm install
+          - npm run lint
+          - npm test
+          - npm run build
