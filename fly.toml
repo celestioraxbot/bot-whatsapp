@@ -32,9 +32,15 @@ primary_region = "gru"  # Região principal onde o aplicativo será hospedado
 
   [[services.tcp_checks]]
     interval = "15s"           # Intervalo para checar a saúde
-    timeout = "2s"             # Tempo limite para a checagem de saúde
-    grace_period = "1s"        # Período de graça antes de reiniciar um contêiner com falha
+    timeout = "5s"             # Aumentado para melhor resposta
+    grace_period = "5s"        # Período de graça antes de reiniciar
     restart_limit = 0          # O número de reinicializações permitidas antes de considerar um erro
+
+  [[services.http_checks]]
+    interval = "15s"           # Intervalo para checar a saúde da aplicação
+    timeout = "5s"             # Tempo limite para a checagem de saúde
+    grace_period = "5s"        # Período de graça antes de reiniciar se falhar
+    path = "/health"           # Rota de verificação de saúde (implemente no seu aplicativo)
 
 [[vm]]
   memory = "1gb"            # Memória alocada para sua VM

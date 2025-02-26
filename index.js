@@ -11,6 +11,10 @@ const winston = require('winston'); // Para logs estruturados
 // Configuração inicial
 const app = express();
 app.use(bodyParser.json());
+// Health check route
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
 
 // Variáveis globais
 let totalSales = 0; // Contador de vendas
